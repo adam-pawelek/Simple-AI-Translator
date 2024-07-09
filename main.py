@@ -11,7 +11,7 @@ def get_from_language(iso639_3):
     iso639_3 = iso639_3.lower()
     return iso639_3
 
-def get_one_language_from_text(text):
+def get_text_language(text):
     # Example dummy function hard coded to return the same weather
     # In production, this could be your backend API or an external API
     tools = [
@@ -64,8 +64,8 @@ def get_one_language_from_text(text):
         return function_args.get("iso639_3")
 
 
-print(get_one_language_from_text("jak ty się nazywasz"))
-print(get_one_language_from_text("hvordan har du det kjære"))
+print(get_text_language("jak ty się nazywasz"))
+print(get_text_language("hvordan har du det kjære"))
 
 
 
@@ -177,6 +177,9 @@ Brama na wciąż otwarta przechodniom ogłasza,
 Że gościnna, i wszystkich w gościnę zaprasza. """
 
 print(translate(text_to_translate, "eng"))
+
+
+print(translate("Cześć jak się masz Meu nome é Adam", "eng"))
 
 
 
