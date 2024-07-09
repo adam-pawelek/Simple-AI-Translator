@@ -5,33 +5,34 @@ import json
 
 client = OpenAI(api_key=os.environ['OPENAI_API_KEY'])
 
-# Example dummy function hard coded to return the same weather
-# In production, this could be your backend API or an external API
-tools = [
-    {
-        "type": "function",
-        "function": {
-            "name": "get_from_language",
-            "description": "Retrieve the ISO 639-3 code for a given language",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "iso639_3": {
-                        "type": "string",
-                        "description": "The ISO 639-3 code for a language, e.g., 'eng' for English",
-                    },
-                },
-                "required": ["iso639_3"],
-            },
-        },
-    }
-]
+model_to_choose = "gpt-4o"
 
 def get_from_language(iso639_3):
     iso639_3 = iso639_3.lower()
     return iso639_3
 
 def get_one_language_from_text(text):
+    # Example dummy function hard coded to return the same weather
+    # In production, this could be your backend API or an external API
+    tools = [
+        {
+            "type": "function",
+            "function": {
+                "name": "get_from_language",
+                "description": "Retrieve the ISO 639-3 code for a given language",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "iso639_3": {
+                            "type": "string",
+                            "description": "The ISO 639-3 code for a language, e.g., 'eng' for English",
+                        },
+                    },
+                    "required": ["iso639_3"],
+                },
+            },
+        }
+    ]
     # Step 1: send the conversation and available functions to the model
     messages = [
         {"role": "system", "content": "You are a language detector. You should return the ISO 639-3 code to the get_from_language function of user text."},
@@ -39,7 +40,7 @@ def get_one_language_from_text(text):
     ]
 
     response = client.chat.completions.create(
-        model="gpt-4o",
+        model=model_to_choose,
         messages=messages,
         tools=tools,
         tool_choice="auto",  # auto is default, but we'll be explicit
@@ -65,3 +66,117 @@ def get_one_language_from_text(text):
 
 print(get_one_language_from_text("jak ty się nazywasz"))
 print(get_one_language_from_text("hvordan har du det kjære"))
+
+
+
+
+def translate_to_language(translated_text):
+    return translated_text
+
+
+
+def translate(text, to_language):
+    # Example dummy function hard coded to return the same weather
+    # In production, this could be your backend API or an external API
+    # Step 1: send the conversation and available functions to the model
+    messages = [
+        {"role": "system", "content": f"You are a language translator. You should translate the text to the {to_language} language and then put result of the translation to the translate_to_language function"},
+        {"role": "user", "content": text}
+    ]
+
+    tools = [
+        {
+            "type": "function",
+            "function": {
+                "name": "translate_to_language",
+                "description": "Returns the translated text",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "translated_text": {
+                            "type": "string",
+                            "description": "The text that has been translated",
+                        },
+                    },
+                    "required": ["translated_text"],
+                },
+            },
+        }
+    ]
+
+    response = client.chat.completions.create(
+        model=model_to_choose,
+        messages=messages,
+        tools=tools,
+        tool_choice="auto",  # auto is default, but we'll be explicit
+    )
+    response_message = response.choices[0].message
+    tool_calls = response_message.tool_calls
+    print(tool_calls)
+    print(response_message)
+    # Step 2: check if the model wanted to call a function
+    if tool_calls:
+        # Step 3: call the function
+        # Note: the JSON response may not always be valid; be sure to handle errors
+        available_functions = {
+            "translate_to_language": translate_to_language
+        }  # only one function in this example, but you can have multiple
+        messages.append(response_message)  # extend conversation with assistant's reply
+        # Step 4: send the info for each function call and function response to the model
+        print(tool_calls)
+        tool_call =  tool_calls[0]
+        function_name = tool_call.function.name
+        function_to_call = available_functions[function_name]
+        function_args = json.loads(tool_call.function.arguments)
+        return function_args.get("translated_text")
+
+
+
+
+
+text_to_translate = """
+Litwo! Ojczyzno moja! ty jesteś jak zdrowie:
+Ile cię trzeba cenić, ten tylko się dowie,
+Kto cię stracił. Dziś piękność twą w całej ozdobie
+Widzę i opisuję, bo tęsknię po tobie. 
+Panno święta, co Jasnej bronisz Częstochowy
+I w Ostrej świecisz Bramie! Ty, co gród zamkowy
+Nowogródzki ochraniasz z jego wiernym ludem!
+Jak mnie dziecko do zdrowia powróciłaś cudem
+(Gdy od płaczącej matki, pod Twoją opiekę
+Ofiarowany, martwą podniosłem powiekę;
+I zaraz mogłem pieszo, do Twych świątyń progu
+Iść za wrócone życie podziękować Bogu),
+Tak nas powrócisz cudem na Ojczyzny łono. 
+Tymczasem przenoś moją duszę utęsknioną
+Do tych pagórków leśnych, do tych łąk zielonych,
+Szeroko nad błękitnym Niemnem rozciągnionych;
+Do tych pól malowanych zbożem rozmaitem,
+Wyzłacanych pszenicą, posrebrzanych żytem;
+Gdzie bursztynowy świerzop, gryka jak śnieg biała,
+Gdzie panieńskim rumieńcem dzięcielina pała,
+A wszystko przepasane jakby wstęgą, miedzą
+Zieloną, na niej z rzadka ciche grusze siedzą. 
+Śród takich pól przed laty, nad brzegiem ruczaju,
+Na pagórku niewielkim, we brzozowym gaju,
+Stał dwór szlachecki, z drzewa, lecz podmurowany;
+Świeciły się z daleka pobielane ściany,
+Tym bielsze, że odbite od ciemnej zieleni
+Topoli, co go bronią od wiatrów jesieni. 
+Dom mieszkalny niewielki, lecz zewsząd chędogi,
+I stodołę miał wielką, i przy niej trzy stogi
+Użątku, co pod strzechą zmieścić się nie może.
+Widać, że okolica obfita we zboże,
+I widać z liczby kopic, co wzdłuż i wszerz smugów 
+Świecą gęsto jak gwiazdy, widać z liczby pługów
+Orzących wcześnie łany ogromne ugoru,
+Czarnoziemne, zapewne należne do dworu,
+Uprawne dobrze na kształt ogrodowych grządek:
+Że w tym domu dostatek mieszka i porządek.
+Brama na wciąż otwarta przechodniom ogłasza,
+Że gościnna, i wszystkich w gościnę zaprasza. """
+
+print(translate(text_to_translate, "eng"))
+
+
+
