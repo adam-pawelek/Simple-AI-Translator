@@ -3,35 +3,15 @@ import os
 from openai import OpenAI
 import json
 
+from utils.function_tools import tools_translate, tools_get_text_language
+
 client = OpenAI(api_key=os.environ['OPENAI_API_KEY'])
 
 model_to_choose = "gpt-4o"
 
-def get_from_language(iso639_3):
-    iso639_3 = iso639_3.lower()
-    return iso639_3
+
 
 def get_text_language(text):
-    tools = [
-        {
-            "type": "function",
-            "function": {
-                "name": "get_from_language",
-                "description": "Retrieve the ISO 639-3 code for a given language",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "iso639_3": {
-                            "type": "string",
-                            "description": "The ISO 639-3 code for a language, e.g., 'eng' for English",
-                        },
-                    },
-                    "required": ["iso639_3"],
-                },
-            },
-        }
-    ]
-
     messages = [
         {"role": "system", "content": "You are a language detector. You should return the ISO 639-3 code to the get_from_language function of user text."},
         {"role": "user", "content": text}
@@ -40,9 +20,10 @@ def get_text_language(text):
     response = client.chat.completions.create(
         model=model_to_choose,
         messages=messages,
-        tools=tools,
+        tools=tools_get_text_language,
         tool_choice="auto",  # auto is default, but we'll be explicit
     )
+
     response_message = response.choices[0].message
     tool_calls = response_message.tool_calls
     if tool_calls:
@@ -54,47 +35,15 @@ def get_text_language(text):
     return None
 
 
-print(get_text_language("jak ty się nazywasz"))
-print(get_text_language("hvordan har du det kjære"))
-
-
-
-
-def translate_to_language(translated_text):
-    return translated_text
-
-
-
 def translate(text, to_language):
     messages = [
         {"role": "system", "content": f"You are a language translator. You should translate the text to the {to_language} language and then put result of the translation to the translate_to_language function"},
         {"role": "user", "content": text}
     ]
-
-    tools = [
-        {
-            "type": "function",
-            "function": {
-                "name": "translate_to_language",
-                "description": "Returns the translated text",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "translated_text": {
-                            "type": "string",
-                            "description": "The text that has been translated",
-                        },
-                    },
-                    "required": ["translated_text"],
-                },
-            },
-        }
-    ]
-
     response = client.chat.completions.create(
         model=model_to_choose,
         messages=messages,
-        tools=tools,
+        tools=tools_translate,
         tool_choice="auto",
     )
     response_message = response.choices[0].message
@@ -103,13 +52,16 @@ def translate(text, to_language):
     print(response_message)
     if tool_calls:
         print(tool_calls)
-        tool_call =  tool_calls[0]
+        tool_call = tool_calls[0]
         function_args = json.loads(tool_call.function.arguments)
         return function_args.get("translated_text")
     return None
 
 
 
+
+print(get_text_language("jak ty się nazywasz"))
+print(get_text_language("hvordan har du det kjære"))
 
 
 text_to_translate = """
