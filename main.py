@@ -12,8 +12,6 @@ def get_from_language(iso639_3):
     return iso639_3
 
 def get_text_language(text):
-    # Example dummy function hard coded to return the same weather
-    # In production, this could be your backend API or an external API
     tools = [
         {
             "type": "function",
@@ -33,7 +31,7 @@ def get_text_language(text):
             },
         }
     ]
-    # Step 1: send the conversation and available functions to the model
+
     messages = [
         {"role": "system", "content": "You are a language detector. You should return the ISO 639-3 code to the get_from_language function of user text."},
         {"role": "user", "content": text}
@@ -47,21 +45,13 @@ def get_text_language(text):
     )
     response_message = response.choices[0].message
     tool_calls = response_message.tool_calls
-    # Step 2: check if the model wanted to call a function
     if tool_calls:
-        # Step 3: call the function
-        # Note: the JSON response may not always be valid; be sure to handle errors
-        available_functions = {
-            "get_from_language": get_from_language
-        }  # only one function in this example, but you can have multiple
-        messages.append(response_message)  # extend conversation with assistant's reply
-        # Step 4: send the info for each function call and function response to the model
         print(tool_calls)
-        tool_call =  tool_calls[0]
-        function_name = tool_call.function.name
-        function_to_call = available_functions[function_name]
+        tool_call = tool_calls[0]
         function_args = json.loads(tool_call.function.arguments)
         return function_args.get("iso639_3")
+
+    return None
 
 
 print(get_text_language("jak ty się nazywasz"))
@@ -76,9 +66,6 @@ def translate_to_language(translated_text):
 
 
 def translate(text, to_language):
-    # Example dummy function hard coded to return the same weather
-    # In production, this could be your backend API or an external API
-    # Step 1: send the conversation and available functions to the model
     messages = [
         {"role": "system", "content": f"You are a language translator. You should translate the text to the {to_language} language and then put result of the translation to the translate_to_language function"},
         {"role": "user", "content": text}
@@ -108,27 +95,18 @@ def translate(text, to_language):
         model=model_to_choose,
         messages=messages,
         tools=tools,
-        tool_choice="auto",  # auto is default, but we'll be explicit
+        tool_choice="auto",
     )
     response_message = response.choices[0].message
     tool_calls = response_message.tool_calls
     print(tool_calls)
     print(response_message)
-    # Step 2: check if the model wanted to call a function
     if tool_calls:
-        # Step 3: call the function
-        # Note: the JSON response may not always be valid; be sure to handle errors
-        available_functions = {
-            "translate_to_language": translate_to_language
-        }  # only one function in this example, but you can have multiple
-        messages.append(response_message)  # extend conversation with assistant's reply
-        # Step 4: send the info for each function call and function response to the model
         print(tool_calls)
         tool_call =  tool_calls[0]
-        function_name = tool_call.function.name
-        function_to_call = available_functions[function_name]
         function_args = json.loads(tool_call.function.arguments)
         return function_args.get("translated_text")
+    return None
 
 
 
