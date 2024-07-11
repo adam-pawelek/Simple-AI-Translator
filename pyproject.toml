@@ -1,9 +1,10 @@
 [tool.poetry]
 name = "simpleaitranslator"
-version = "0.1.23"
+version = "0.1.26"
 description = ""
 authors = ["Adam Pawełek <adam.pwk@outlook.com>"]
 readme = "README.md"
+
 
 [tool.poetry.dependencies]
 python = "^3.10"

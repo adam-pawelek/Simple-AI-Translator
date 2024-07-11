@@ -110,6 +110,7 @@ Here are some of the most popular languages and their ISO 639-3 codes:
 
 - [PyPI page](https://pypi.org/project/simpleaitranslator/)
 - [ISO 639-3 Codes](https://iso639-3.sil.org/code_tables/639/data)
+- [Github project repository](https://github.com/adam-pawelek/SimpleAITranslator)
 
 ## License
 
