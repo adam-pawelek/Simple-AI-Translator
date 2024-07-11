@@ -42,7 +42,11 @@ simpleaitranslator.translator.OPENAI_API_KEY = "<YOUR_OPENAI_API_KEY>"
 To detect the language of a given text:
 
 ```python
+import os
+import simpleaitranslator.translator
 from simpleaitranslator.translator import get_text_language
+# Set your OpenAI API key
+simpleaitranslator.translator.OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
 print(get_text_language("Hello world"))  # Output: 'eng'
 ```
@@ -52,7 +56,11 @@ print(get_text_language("Hello world"))  # Output: 'eng'
 To translate text containing multiple languages into another language:
 
 ```python
+import os
+import simpleaitranslator.translator
 from simpleaitranslator.translator import translate
+# Set your OpenAI API key
+simpleaitranslator.translator.OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
 print(translate("Cześć jak się masz? Meu nome é Adam", "eng"))  # Output: "Hello how are you? My name is Adam"
 ```
