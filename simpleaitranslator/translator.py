@@ -2,13 +2,17 @@ import os
 from openai import OpenAI
 import json
 from simpleaitranslator.utils.function_tools import tools_get_text_language, tools_translate
-
+import simpleaitranslator.translator
 CHATGPT_MODEL = "gpt-4o"
 OPENAI_API_KEY=None
 
 
 def get_text_language(text):
-    global OPENAI_API_KEY
+    if not simpleaitranslator.translator.OPENAI_API_KEY:
+        raise ValueError(
+            "OpenAI API key is not set. Please set the API key in simpleaitranslator.translator.OPENAI_API_KEY. "
+            "See documentation: https://github.com/adam-pawelek/SimpleAITranslator/tree/main?tab=readme-ov-file#setting-up"
+        )
     client = OpenAI(api_key=OPENAI_API_KEY)
     messages = [
         {"role": "system", "content": "You are a language detector. You should return the ISO 639-3 code to the get_from_language function of user text."},
@@ -34,7 +38,11 @@ def get_text_language(text):
 
 
 def translate(text, to_language):
-    global OPENAI_API_KEY
+    if not simpleaitranslator.translator.OPENAI_API_KEY:
+        raise ValueError(
+            "OpenAI API key is not set. Please set the API key in simpleaitranslator.translator.OPENAI_API_KEY. "
+            "See documentation: https://github.com/adam-pawelek/SimpleAITranslator/tree/main?tab=readme-ov-file#setting-up"
+        )
     client = OpenAI(api_key=OPENAI_API_KEY)
     messages = [
         {"role": "system", "content": f"You are a language translator. You should translate the text to the {to_language} language and then put result of the translation to the translate_to_language function"},
