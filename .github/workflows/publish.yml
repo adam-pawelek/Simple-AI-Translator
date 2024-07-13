@@ -2,7 +2,7 @@ name: Python package - Publish
 
 on:
   workflow_run:
-    workflows: ["Python package - Test"]
+    workflows: ["Test"]
     types:
       - completed
 
