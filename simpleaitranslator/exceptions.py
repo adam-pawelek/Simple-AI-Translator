@@ -3,7 +3,7 @@ from simpleaitranslator.utils.enums import ChatGPTModel
 
 class MissingAPIKeyError(Exception):
     """Exception raised for missing API key."""
-    def __init__(self, message="OpenAI API key is not set. Please set the API key using the instructions in the documentation. See: https://github.com/adam-pawelek/SimpleAITranslator/tree/main?tab=readme-ov-file#setting-up"):
+    def __init__(self, message="OpenAI API key is not set. Please set the API key using the instructions in the documentation. See: https://github.com/adam-pawelek/SimpleAITranslator?tab=readme-ov-file#setting-the-openai-api-key"):
         self.message = message
         super().__init__(self.message)
 
