@@ -23,29 +23,41 @@ pip install simpleaitranslator
 
 ## Usage
 
-### Setting Up
+### Setting the OpenAI API Key
 
-Before using the library, set your OpenAI API key:
+Before using SimpleAITranslator, you need to set your OpenAI API key. You can do this by calling the `set_openai_api_key` function.
 
 ```python
-import os
-import simpleaitranslator.translator
+from simpleaitranslator.translator import set_openai_api_key
 
 # Set your OpenAI API key
-simpleaitranslator.translator.OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-# or directly
-simpleaitranslator.translator.OPENAI_API_KEY = "<YOUR_OPENAI_API_KEY>"
+set_openai_api_key("<YOUR_OPENAI_API_KEY>")
 ```
+
+### Setting the Azure OpenAI API Key
+
+If you are using Azure's OpenAI services, you need to set your Azure OpenAI API key along with additional required parameters. Use the `set_azure_openai_api_key` function to do this.
+
+```python
+from simpleaitranslator.translator import set_azure_openai_api_key
+
+# Set your Azure OpenAI API key
+set_azure_openai_api_key(
+    azure_endpoint="<YOUR_AZURE_ENDPOINT>",
+    api_key="<YOUR_AZURE_API_KEY>",
+    api_version="<YOUR_API_VERSION>",
+    azure_deployment="<YOUR_AZURE_DEPLOYMENT>"
+)
+```
+
 
 ### Language Detection
 
 To detect the language of a given text:
 
 ```python
-import os
-import simpleaitranslator.translator
-from simpleaitranslator.translator import get_text_language
-simpleaitranslator.translator.OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+from simpleaitranslator.translator import get_text_language,set_openai_api_key
+set_openai_api_key("<YOUR_OPENAI_API_KEY>")
 
 print(get_text_language("Hello world"))  # Output: 'eng'
 ```
@@ -55,10 +67,8 @@ print(get_text_language("Hello world"))  # Output: 'eng'
 To translate text containing multiple languages into another language:
 
 ```python
-import os
-import simpleaitranslator.translator
-from simpleaitranslator.translator import translate
-simpleaitranslator.translator.OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+from simpleaitranslator.translator import translate, set_openai_api_key
+set_openai_api_key("<YOUR_OPENAI_API_KEY>")
 
 print(translate("Cześć jak się masz? Meu nome é Adam", "eng"))  # Output: "Hello how are you? My name is Adam"
 ```
@@ -69,12 +79,8 @@ print(translate("Cześć jak się masz? Meu nome é Adam", "eng"))  # Output: "H
 Here is a complete example demonstrating how to use the library:
 
 ```python
-import os
-import simpleaitranslator.translator
-from simpleaitranslator.translator import get_text_language, translate
-
-# Set your OpenAI API key
-simpleaitranslator.translator.OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+from simpleaitranslator.translator import get_text_language, translate, set_openai_api_key
+set_openai_api_key("<YOUR_OPENAI_API_KEY>")
 
 # Detect language
 print(get_text_language("jak ty się nazywasz"))  # Output: 'pol'
