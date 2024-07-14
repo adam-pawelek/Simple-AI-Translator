@@ -127,15 +127,12 @@ Here are some of the most popular languages and their ISO 639-3 codes:
 - [ISO 639-3 Codes](https://iso639-3.sil.org/code_tables/639/data)
 - [Github project repository](https://github.com/adam-pawelek/SimpleAITranslator)
 
-## Author
+## Authors
+- Adam Pawełek  
+  - [LinkedIn](https://www.linkedin.com/in/adam-roman-pawelek/)  
+  - [Email](mailto:adam.pwk@outlook.com)
+  
 
-### Adam Pawelek 
-<a href="https://www.linkedin.com/in/adam-roman-pawelek/">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/0/01/LinkedIn_Logo.svg" alt="LinkedIn" style="height:40px; margin-right: 10px;"/>
-</a>
-<a href="mailto:adam.pwk@outlook.com">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Mail_%28iOS%29.svg" alt="Email" style="height:40px;"/>
-</a>
 
 ## License
 
