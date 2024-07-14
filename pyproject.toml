@@ -1,10 +1,8 @@
 [tool.poetry]
 name = "simpleaitranslator"
-version = "2.0.13"
+version = "2.0.14"
 description = "A Python library for language detection and translation using OpenAI's GPT-4."
-authors = [
-    {name = "Adam Pawelek", url = "https://www.linkedin.com/in/adam-roman-pawelek/", email = "adam.pwk@outlook.com"}
-]
+authors = ["Adam Pawelek <adam.pwk@outlook.com> <https://www.linkedin.com/in/adam-roman-pawelek/>"]
 readme = "README.md"
 
 [tool.poetry.urls]
