@@ -6,7 +6,6 @@ authors = ["Adam Pawełek <adam.pwk@outlook.com>"]
 readme = "README.md"
 
 [tool.poetry.urls]
-homepage = "https://github.com/adam-pawelek/SimpleAITranslator"
 documentation = "https://github.com/adam-pawelek/SimpleAITranslator"
 source = "https://github.com/adam-pawelek/SimpleAITranslator"
 
