@@ -1,4 +1,4 @@
-def translate_to_language(translated_text):
+def display_translated_text(translated_text):
     return translated_text
 
 
@@ -6,19 +6,23 @@ tools_translate = [
     {
         "type": "function",
         "function": {
-            "name": "translate_to_language",
-            "description": "Returns the translated text",
+            "name": "display_translated_text",
+            "description": "Displays the translated text to the user",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "translated_text": {
                         "type": "string",
-                        "description": "The text that has been translated",
+                        "description": "The text that has been translated and needs to be displayed",
                     },
                 },
                 "required": ["translated_text"],
             },
-        },
+            "returns": {
+                "type": "string",
+                "description": "The translated text that has been displayed"
+            }
+        }
     }
 ]
 
