@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ## Overview
 
-SimpleAITranslator is a Python library designed to identify the language of a given text and translate text between multiple languages using OpenAI's GPT-4. The library is especially useful for translating text containing multiple languages into a single target language.
+SimpleAITranslator is a Python library designed to identify the language of a given text and translate text between multiple languages using OpenAI's GPT-4o. The library is especially useful for translating text containing multiple languages into a single target language.
 
 ## Features
 
@@ -15,7 +15,7 @@ SimpleAITranslator is a Python library designed to identify the language of a gi
 
 ## Requirements
 
-To use this library, you must have an OpenAI API key. This key allows the library to utilize OpenAI's GPT-4 for translation and language detection.
+To use this library, you must have an OpenAI API key. This key allows the library to utilize OpenAI's GPT-4o for translation and language detection.
 
 
 
@@ -97,7 +97,7 @@ print(translate("Cześć jak się masz? Meu nome é Adam", "eng"))  # Output: "H
 
 ## Supported Languages
 
-SimpleAITranslator supports all languages supported by GPT-4. For a complete list of language codes, you can visit the [ISO 639-3 website](https://iso639-3.sil.org/code_tables/639/data).
+SimpleAITranslator supports all languages supported by GPT-4o. For a complete list of language codes, you can visit the [ISO 639-3 website](https://iso639-3.sil.org/code_tables/639/data).
 
 Here are some of the most popular languages and their ISO 639-3 codes:
 
