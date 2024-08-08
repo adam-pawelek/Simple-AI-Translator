@@ -7,7 +7,7 @@ from simpleaitranslator.utils.enums import ChatGPTModel
 from simpleaitranslator.utils.function_tools import tools_get_text_language, tools_translate
 from pydantic import BaseModel
 
-CHATGPT_MODEL = ChatGPTModel.BEST_BIG_MODEL.value
+CHATGPT_MODEL_NAME = ChatGPTModel.BEST_BIG_MODEL.value
 client = None
 MAX_LENGTH = 1000
 MAX_LENGTH_MINI_TEXT_CHUNK = 128
@@ -57,7 +57,7 @@ def set_azure_openai_api_key(azure_endpoint, api_key, api_version, azure_deploym
         azure_deployment=azure_deployment
     )
 
-def set_chatgpt_model(chatgpt_model_name: CHATGPT_MODEL | str):
+def set_chatgpt_model(chatgpt_model_name: ChatGPTModel | str):
     """
     Sets the default ChatGPT model.
 
@@ -69,10 +69,10 @@ def set_chatgpt_model(chatgpt_model_name: CHATGPT_MODEL | str):
     from simpleaitranslator.utils.enums import ChatGPTModel
 
     Parameters:
-    chatgpt_model_name (str or CHATGPT_MODEL): The name of the ChatGPT model to set. Recommended values are:
+    chatgpt_model_name (str or ChatGPTModel): The name of the ChatGPT model to set. Recommended values are:
     For enums:
-        - CHATGPT_MODEL.BEST_BIG_MODEL
-        - CHATGPT_MODEL.BEST_SMALL_MODEL
+        - ChatGPTModel.BEST_BIG_MODEL
+        - ChatGPTModel.BEST_SMALL_MODEL
     For strings:
         - "gpt-4o-2024-08-06"
         - "gpt-4o-mini"
@@ -85,11 +85,11 @@ def set_chatgpt_model(chatgpt_model_name: CHATGPT_MODEL | str):
         if model_to_check not in {model.value for model in ChatGPTModel}:
             raise InvalidModelName(invalid_model_name=model_to_check)
 
-    global CHATGPT_MODEL
+    global CHATGPT_MODEL_NAME
     if type(chatgpt_model_name) ==ChatGPTModel:
-        CHATGPT_MODEL = chatgpt_model_name.value
+        CHATGPT_MODEL_NAME = chatgpt_model_name.value
     elif type(chatgpt_model_name) == str and validate_model(chatgpt_model_name):
-        CHATGPT_MODEL = chatgpt_model_name
+        CHATGPT_MODEL_NAME = chatgpt_model_name
     else:
         raise ValueError('chatgpt_model name is required - current value is None or have wrong format')
 
@@ -113,7 +113,7 @@ def get_text_language(text):
     ]
 
     response = client.chat.completions.create(
-        model=CHATGPT_MODEL,
+        model=CHATGPT_MODEL_NAME,
         messages=messages,
         tools=tools_get_text_language,
         tool_choice="auto",  # auto is default, but we'll be explicit
@@ -144,7 +144,7 @@ def translate_chunk_of_text(text_chunk: str, to_language: str) -> str:
     ]
 
     response = client.chat.completions.create(
-        model=CHATGPT_MODEL,
+        model=CHATGPT_MODEL_NAME,
         messages=messages,
         tools=tools_translate,
         tool_choice="auto",
@@ -175,7 +175,7 @@ def translate_chunk_of_text(text_chunk: str, to_language: str) -> str:
                 }
             )
             response = client.chat.completions.create(
-                model=CHATGPT_MODEL,
+                model=CHATGPT_MODEL_NAME,
                 messages=messages,
                 tools=tools_translate,
                 tool_choice="auto",
@@ -268,10 +268,10 @@ class HowManyLanguages(BaseModel):
     number_of_languages: int
 
 def how_many_languages_are_in_text(text):
-    global CHATGPT_MODEL
+    global CHATGPT_MODEL_NAME
     global client
     completion = client.beta.chat.completions.parse(
-        model=CHATGPT_MODEL,
+        model=CHATGPT_MODEL_NAME,
         messages=[
             {"role": "system", "content": "You are text languages counter you should count how many languaes are in provided by user text"},
             {"role": "user", "content": f"Please count how many languaes are in this text:\n{text}"},
