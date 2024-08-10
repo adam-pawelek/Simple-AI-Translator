@@ -244,8 +244,8 @@ async def async_translate_text(text: str, to_language ="eng") -> str:
     # Run how_many_languages_are_in_text concurrently
     counted_number_of_languages = await asyncio.gather(*[how_many_languages_are_in_text(text_chunk) for text_chunk in text_chunks])
 
-    print(f"Counted number of languages {counted_number_of_languages}")
-    print(f"len of text_chunks {len(text_chunks)}")
+    #print(f"Counted number of languages {counted_number_of_languages}")
+    #print(f"len of text_chunks {len(text_chunks)}")
 
     tasks = []
     for index, text_chunk in enumerate(text_chunks):
@@ -258,8 +258,8 @@ async def async_translate_text(text: str, to_language ="eng") -> str:
 
     translated_list = await asyncio.gather(*tasks)
 
-    print(translated_list)
-    print(len(translated_list))
+    #print(translated_list)
+    #print(len(translated_list))
     return " ".join(translated_list)
 
 def translate(text, to_language ="eng") -> str: #ISO 639-3
