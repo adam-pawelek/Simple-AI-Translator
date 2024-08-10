@@ -134,6 +134,9 @@ def get_text_language(text):
     return result
 
 
+class TranslateFormat(BaseModel):
+    translated_text: str
+
 async def translate_chunk_of_text(text_chunk: str, to_language: str) -> str:
     global client
     if not client:
@@ -141,58 +144,19 @@ async def translate_chunk_of_text(text_chunk: str, to_language: str) -> str:
 
     messages = [
         {"role": "system",
-         "content": f"You are a language translator. You should translate the text to the {to_language} language and then put the result of the translation into the display_translated_text function"},
+         "content": f"You are a language translator. You should translate text provided by user to the {to_language} language. Don't write additional message like This is translated text just translate text."},
         {"role": "user", "content": text_chunk}
     ]
 
-    response = await client.chat.completions.create(
+    response = await client.beta.chat.completions.parse(
         model=CHATGPT_MODEL_NAME,
         messages=messages,
-        tools=tools_translate,
-        tool_choice="auto",
+        response_format=TranslateFormat  # auto is default, but we'll be explicit
     )
 
-    response_message = response.choices[0].message
-    messages.append(response_message)  # extend conversation with assistant's reply
+    response_message = response.choices[0].message.parsed.translated_text
+    return response_message
 
-    tool_calls = response_message.tool_calls
-    if tool_calls:
-        tool_call = tool_calls[0]
-        function_args = tool_call.function.arguments
-
-        # Attempt to parse the function arguments
-        try:
-            function_args_dict = json.loads(function_args)
-            return function_args_dict.get("translated_text")
-        except json.JSONDecodeError:
-            # Inform the chatbot to correct the format
-            print("Error")
-            print(function_args)
-            messages.append(
-                {
-                    "tool_call_id": tool_call.id,
-                    "role": "tool",
-                    "name": "translated_text",
-                    "content": "Error Please ensure the translated text is returned as a JSON object with the key 'translated_text'.",
-                }
-            )
-            response = await client.chat.completions.create(
-                model=CHATGPT_MODEL_NAME,
-                messages=messages,
-                tools=tools_translate,
-                tool_choice="auto",
-            )
-            response_message = response.choices[0].message
-            messages.append(response_message)
-
-            tool_calls = response_message.tool_calls
-            if tool_calls:
-                tool_call = tool_calls[0]
-                function_args = tool_call.function.arguments
-                function_args_dict = json.loads(function_args)
-                return function_args_dict.get("translated_text")
-
-    return None
 
 
 
