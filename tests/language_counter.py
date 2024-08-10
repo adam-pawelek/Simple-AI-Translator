@@ -1,5 +1,6 @@
 import os
 import simpleaitranslator
+from simpleaitranslator.translator import get_text_language
 #from simpleaitranslator.translator import how_many_languages_are_in_text
 from simpleaitranslator.utils.enums import ChatGPTModel
 from simpleaitranslator import translator
@@ -42,6 +43,7 @@ print(len(text))
 print()
 
 #print(how_many_languages_are_in_text(text))
-
+print(get_text_language("jak ty się nazywasz"))
+print(get_text_language(text))
 
 print(translator.translate(text, "eng"))

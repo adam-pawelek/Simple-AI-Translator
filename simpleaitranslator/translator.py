@@ -96,47 +96,48 @@ def set_chatgpt_model(chatgpt_model_name: ChatGPTModel | str):
         raise ValueError('chatgpt_model name is required - current value is None or have wrong format')
 
 
-def get_first_thousand_words(text: str) -> str:
+def get_first_n_words(text: str, n_words) -> str:
     words = re.split(r'\s+', text)
-    words = words[0:MAX_LENGTH]
+    words = words[0:n_words]
     return ' '.join(words)
 
 
+class TextLanguageFormat(BaseModel):
+    language_ISO_639_3_code: str
 
-async def get_text_language(text):
+
+async def async_get_text_language(text):
     global client
+    global MAX_LENGTH
     if not client:
         raise MissingAPIKeyError()
 
-    text = get_first_thousand_words(text)
+    text = get_first_n_words(text,MAX_LENGTH)
     messages = [
-        {"role": "system", "content": "You are a language detector. You should return the ISO 639-3 code to the get_from_language function of user text."},
+        {"role": "system", "content": "You are a language detector. You should return only the ISO 639-3 code of the text provided by user"},
         {"role": "user", "content": text}
     ]
 
-    response = await client.chat.completions.create(
+    response = await client.beta.chat.completions.parse(
         model=CHATGPT_MODEL_NAME,
         messages=messages,
-        tools=tools_get_text_language,
-        tool_choice="auto",  # auto is default, but we'll be explicit
+        response_format=TextLanguageFormat  # auto is default, but we'll be explicit
     )
 
-    response_message = response.choices[0].message
-    tool_calls = response_message.tool_calls
-    if tool_calls:
-        #print(tool_calls)
-        tool_call = tool_calls[0]
-        function_args = json.loads(tool_call.function.arguments)
-        return function_args.get("iso639_3")
+    response_message = response.choices[0].message.parsed.language_ISO_639_3_code
+    return response_message
 
-    return None
+
+
+def get_text_language(text):
+    result = asyncio.run(async_get_text_language(text))
+    return result
 
 
 async def translate_chunk_of_text(text_chunk: str, to_language: str) -> str:
     global client
     if not client:
         raise MissingAPIKeyError()
-
 
     messages = [
         {"role": "system",
