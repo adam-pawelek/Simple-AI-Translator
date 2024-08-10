@@ -1,7 +1,8 @@
 import os
 import simpleaitranslator
-from simpleaitranslator.translator import how_many_languages_are_in_text
+#from simpleaitranslator.translator import how_many_languages_are_in_text
 from simpleaitranslator.utils.enums import ChatGPTModel
+from simpleaitranslator import translator
 
 text = """
 Gospodarstwo
@@ -40,7 +41,7 @@ print(len(text))
 
 print()
 
-print(how_many_languages_are_in_text(text))
+#print(how_many_languages_are_in_text(text))
 
 
-print(simpleaitranslator.translator.translate(text, "eng"))
+print(translator.translate(text, "eng"))

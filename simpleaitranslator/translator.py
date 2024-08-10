@@ -1,6 +1,8 @@
+import asyncio
+import os
 import re
-from openai import OpenAI
-from openai import AzureOpenAI
+from openai import AsyncAzureOpenAI
+from openai import AsyncOpenAI
 import json
 from simpleaitranslator.exceptions import MissingAPIKeyError, NoneAPIKeyProvidedError, InvalidModelName
 from simpleaitranslator.utils.enums import ChatGPTModel
@@ -25,7 +27,7 @@ def set_openai_api_key(api_key):
     if not api_key:
         raise NoneAPIKeyProvidedError()
     global client
-    client = OpenAI(api_key=api_key)
+    client = AsyncOpenAI(api_key=api_key)
 
 def set_azure_openai_api_key(azure_endpoint, api_key, api_version, azure_deployment):
     """
@@ -50,7 +52,7 @@ def set_azure_openai_api_key(azure_endpoint, api_key, api_version, azure_deploym
     if not azure_endpoint:
         raise ValueError('azure_endpoint is required - current value is None')
     global client
-    client = AzureOpenAI(
+    client = AsyncAzureOpenAI(
         azure_endpoint=azure_endpoint,
         api_key=api_key,
         api_version=api_version,
@@ -101,7 +103,7 @@ def get_first_thousand_words(text: str) -> str:
 
 
 
-def get_text_language(text):
+async def get_text_language(text):
     global client
     if not client:
         raise MissingAPIKeyError()
@@ -112,7 +114,7 @@ def get_text_language(text):
         {"role": "user", "content": text}
     ]
 
-    response = client.chat.completions.create(
+    response = await client.chat.completions.create(
         model=CHATGPT_MODEL_NAME,
         messages=messages,
         tools=tools_get_text_language,
@@ -130,12 +132,11 @@ def get_text_language(text):
     return None
 
 
-def translate_chunk_of_text(text_chunk: str, to_language: str) -> str:
+async def translate_chunk_of_text(text_chunk: str, to_language: str) -> str:
     global client
     if not client:
         raise MissingAPIKeyError()
 
-    number_of_languages_in_text_chunk = how_many_languages_are_in_text(text_chunk)
 
     messages = [
         {"role": "system",
@@ -143,7 +144,7 @@ def translate_chunk_of_text(text_chunk: str, to_language: str) -> str:
         {"role": "user", "content": text_chunk}
     ]
 
-    response = client.chat.completions.create(
+    response = await client.chat.completions.create(
         model=CHATGPT_MODEL_NAME,
         messages=messages,
         tools=tools_translate,
@@ -174,7 +175,7 @@ def translate_chunk_of_text(text_chunk: str, to_language: str) -> str:
                     "content": "Error Please ensure the translated text is returned as a JSON object with the key 'translated_text'.",
                 }
             )
-            response = client.chat.completions.create(
+            response = await client.chat.completions.create(
                 model=CHATGPT_MODEL_NAME,
                 messages=messages,
                 tools=tools_translate,
@@ -234,6 +235,33 @@ def split_text_to_chunks(text, max_lenght):
     return [" ".join(chunk) for chunk in chunks_of_text]
 
 
+
+async def async_translate_text(text: str, to_language ="eng") -> str:
+    global MAX_LENGTH
+    global MAX_LENGTH_MINI_TEXT_CHUNK
+    text_chunks = split_text_to_chunks(text, MAX_LENGTH)
+
+    # Run how_many_languages_are_in_text concurrently
+    counted_number_of_languages = await asyncio.gather(*[how_many_languages_are_in_text(text_chunk) for text_chunk in text_chunks])
+
+    print(f"Counted number of languages {counted_number_of_languages}")
+    print(f"len of text_chunks {len(text_chunks)}")
+
+    tasks = []
+    for index, text_chunk in enumerate(text_chunks):
+        if counted_number_of_languages[index] > 1:
+            mini_text_chunks = split_text_to_chunks(text_chunk, MAX_LENGTH_MINI_TEXT_CHUNK)
+            for mini_text_chunk in mini_text_chunks:
+                tasks.append(translate_chunk_of_text(mini_text_chunk, to_language))
+        else:
+            tasks.append(translate_chunk_of_text(text_chunk, to_language))
+
+    translated_list = await asyncio.gather(*tasks)
+
+    print(translated_list)
+    print(len(translated_list))
+    return " ".join(translated_list)
+
 def translate(text, to_language ="eng") -> str: #ISO 639-3
     """
     Translates the given text to the specified language.
@@ -245,32 +273,17 @@ def translate(text, to_language ="eng") -> str: #ISO 639-3
     Returns:
     str: The translated text.
     """
-    global MAX_LENGTH
-    global MAX_LENGTH_MINI_TEXT_CHUNK
-    text_chunks = split_text_to_chunks(text, MAX_LENGTH)
-    #print(text_chunks)
-    translated_list = []
-    for index, text_chunk in enumerate(text_chunks):
-        if how_many_languages_are_in_text(text_chunk) > 1:
-            mini_text_chunks = split_text_to_chunks(text_chunk, MAX_LENGTH_MINI_TEXT_CHUNK)
-            for mini_text_chunk in mini_text_chunks:
-                translated_list.append(translate_chunk_of_text(mini_text_chunk, to_language))
-        else:
-            translated_tex = translate_chunk_of_text(text_chunk, to_language)
-            translated_list.append(translated_tex)
-
-    #print(translated_list)
-    #print(len(translated_list))
-    return " ".join(translated_list)
+    translated_text =  asyncio.run(async_translate_text(text, to_language))
+    return translated_text
 
 
 class HowManyLanguages(BaseModel):
     number_of_languages: int
 
-def how_many_languages_are_in_text(text):
+async def how_many_languages_are_in_text(text):
     global CHATGPT_MODEL_NAME
     global client
-    completion = client.beta.chat.completions.parse(
+    completion = await client.beta.chat.completions.parse(
         model=CHATGPT_MODEL_NAME,
         messages=[
             {"role": "system", "content": "You are text languages counter you should count how many languaes are in provided by user text"},
