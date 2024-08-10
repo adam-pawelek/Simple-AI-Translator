@@ -1,16 +1,16 @@
 import asyncio
-import os
-import re
 from openai import AsyncAzureOpenAI
 from openai import AsyncOpenAI
-import json
 from simpleaitranslator.exceptions import MissingAPIKeyError, NoneAPIKeyProvidedError, InvalidModelName
-from simpleaitranslator.utils.enums import ChatGPTModel
-from simpleaitranslator.utils.function_tools import tools_get_text_language, tools_translate
+from simpleaitranslator.utils.chunk_translator import translate_chunk_of_text
+from simpleaitranslator.utils.enums import ChatGPTModelForTranslator
 from pydantic import BaseModel
 
-CHATGPT_MODEL_NAME = ChatGPTModel.BEST_BIG_MODEL.value
-client = None
+from simpleaitranslator.utils.language_counter import how_many_languages_are_in_text
+from simpleaitranslator.utils.text_splitter import split_text_to_chunks, get_first_n_words
+from typing import Optional
+CHATGPT_MODEL_NAME = ChatGPTModelForTranslator.BEST_BIG_MODEL
+global_client = None
 MAX_LENGTH = 1000
 MAX_LENGTH_MINI_TEXT_CHUNK = 128
 
@@ -26,8 +26,8 @@ def set_openai_api_key(api_key):
     """
     if not api_key:
         raise NoneAPIKeyProvidedError()
-    global client
-    client = AsyncOpenAI(api_key=api_key)
+    global global_client
+    global_client = AsyncOpenAI(api_key=api_key)
 
 def set_azure_openai_api_key(azure_endpoint, api_key, api_version, azure_deployment):
     """
@@ -51,75 +51,78 @@ def set_azure_openai_api_key(azure_endpoint, api_key, api_version, azure_deploym
         raise ValueError('api_version is required - current value is None')
     if not azure_endpoint:
         raise ValueError('azure_endpoint is required - current value is None')
-    global client
-    client = AsyncAzureOpenAI(
+    global global_client
+    global_client = AsyncAzureOpenAI(
         azure_endpoint=azure_endpoint,
         api_key=api_key,
         api_version=api_version,
         azure_deployment=azure_deployment
     )
 
-def set_chatgpt_model(chatgpt_model_name: ChatGPTModel | str):
+
+def set_chatgpt_model(chatgpt_model_name: ChatGPTModelForTranslator):
     """
     Sets the default ChatGPT model.
 
     This function allows you to change the default ChatGPT model used in the application.
-    You can assign either a string representing the name of the GPT model or
-    ENUMS (recommended approach) to the chatgpt_model_name variable
 
     Line to import enums:
     from simpleaitranslator.utils.enums import ChatGPTModel
 
     Parameters:
-    chatgpt_model_name (str or ChatGPTModel): The name of the ChatGPT model to set. Recommended values are:
-    For enums:
-        - ChatGPTModel.BEST_BIG_MODEL
-        - ChatGPTModel.BEST_SMALL_MODEL
-    For strings:
-        - "gpt-4o-2024-08-06"
-        - "gpt-4o-mini"
+    chatgpt_model_name (str or ChatGPTModel): The name of the ChatGPT model to set.
+    Recommended enums are:
+        - ChatGPTModelForTranslator.BEST_BIG_MODEL
+        - ChatGPTModelForTranslator.BEST_SMALL_MODEL
 
     Raises:
     InvalidModelName: If the provided model name is not valid.
     ValueError: If the chatgpt_model_name is None or in an incorrect format.
     """
-    def validate_model(model_to_check: str) -> None:
-        if model_to_check not in {model.value for model in ChatGPTModel}:
-            raise InvalidModelName(invalid_model_name=model_to_check)
-
     global CHATGPT_MODEL_NAME
-    if type(chatgpt_model_name) ==ChatGPTModel:
-        CHATGPT_MODEL_NAME = chatgpt_model_name.value
-    elif type(chatgpt_model_name) == str and validate_model(chatgpt_model_name):
+
+    if type(chatgpt_model_name) == ChatGPTModelForTranslator:
         CHATGPT_MODEL_NAME = chatgpt_model_name
     else:
         raise ValueError('chatgpt_model name is required - current value is None or have wrong format')
 
 
-def get_first_n_words(text: str, n_words) -> str:
-    words = re.split(r'\s+', text)
-    words = words[0:n_words]
-    return ' '.join(words)
+
+def _get_setup_for_one_request(chatgpt_model_name, open_ai_api_key_for_this_translation)->(ChatGPTModelForTranslator, AsyncAzureOpenAI | AsyncOpenAI):
+    global global_client
+    global CHATGPT_MODEL_NAME
+    # Setup configuration for translation
+    if not global_client and not open_ai_api_key_for_this_translation:
+        raise MissingAPIKeyError()
+    if chatgpt_model_name is None:
+        chatgpt_model_name = CHATGPT_MODEL_NAME
+
+    if open_ai_api_key_for_this_translation is None:
+        client = AsyncOpenAI(api_key=open_ai_api_key_for_this_translation)
+    else:
+        client = global_client
+
+    return chatgpt_model_name, client
 
 
 class TextLanguageFormat(BaseModel):
     language_ISO_639_3_code: str
 
 
-async def async_get_text_language(text):
-    global client
-    global MAX_LENGTH
-    if not client:
-        raise MissingAPIKeyError()
+async def async_get_text_language(text, chatgpt_model_name: Optional[ChatGPTModelForTranslator] = None,
+                                  open_ai_api_key_for_this_translation: Optional[str] = None) -> str:
 
-    text = get_first_n_words(text,MAX_LENGTH)
+    global MAX_LENGTH
+    chatgpt_model_name, client = _get_setup_for_one_request(chatgpt_model_name, open_ai_api_key_for_this_translation)
+
+    text = get_first_n_words(text, MAX_LENGTH)
     messages = [
         {"role": "system", "content": "You are a language detector. You should return only the ISO 639-3 code of the text provided by user"},
         {"role": "user", "content": text}
     ]
 
     response = await client.beta.chat.completions.parse(
-        model=CHATGPT_MODEL_NAME,
+        model=chatgpt_model_name.value,
         messages=messages,
         response_format=TextLanguageFormat  # auto is default, but we'll be explicit
     )
@@ -128,134 +131,102 @@ async def async_get_text_language(text):
     return response_message
 
 
+def get_text_language(text: str, chatgpt_model_name: Optional[ChatGPTModelForTranslator] = None,
+                      open_ai_api_key_for_this_translation: Optional[str] = None) -> str:
+    """
+    Detects the language of a given text using a specified ChatGPT model (ISO 639-3 code).
 
-def get_text_language(text):
-    result = asyncio.run(async_get_text_language(text))
+    Parameters:
+    -----------
+    Required:
+    - text : str
+        The text to detect the language of.
+
+    Optional:
+    - chatgpt_model_name : Optional[ChatGPTModelForTranslator], optional
+        ChatGPT model for language detection. Default is None.
+    - open_ai_api_key_for_this_translation : Optional[str], optional
+        OpenAI API key for the translation. Default is None.
+
+    Returns:
+    --------
+    str
+        ISO 639-3 code of the detected language.
+
+    """
+    result = asyncio.run(async_get_text_language(text, chatgpt_model_name, open_ai_api_key_for_this_translation))
     return result
 
 
-class TranslateFormat(BaseModel):
-    translated_text: str
-
-async def translate_chunk_of_text(text_chunk: str, to_language: str) -> str:
-    global client
-    if not client:
-        raise MissingAPIKeyError()
-
-    messages = [
-        {"role": "system",
-         "content": f"You are a language translator. You should translate text provided by user to the {to_language} language. Don't write additional message like This is translated text just translate text."},
-        {"role": "user", "content": text_chunk}
-    ]
-
-    response = await client.beta.chat.completions.parse(
-        model=CHATGPT_MODEL_NAME,
-        messages=messages,
-        response_format=TranslateFormat  # auto is default, but we'll be explicit
-    )
-
-    response_message = response.choices[0].message.parsed.translated_text
-    return response_message
-
-
-
-
-def split_text_to_chunks(text, max_lenght):
-    global WORD_TOKEN_MULTIPLY
-    splited_text = re.split(r'\s+', text)
-    last_comma_index = -1
-    last_dot_index = -1
-    last_index = 0
-    chunks_of_text = []
-
-
-    for index, word in enumerate(splited_text):
-        if "," in word:
-            last_comma_index = index
-        if "." in word or "?" in word or "!" in word:
-            last_dot_index = index
-
-        if (index - last_index + 1) > max_lenght:
-            if last_dot_index >= last_index:
-                chunks_of_text.append(splited_text[last_index:last_dot_index + 1])
-                last_index = last_dot_index + 1
-            elif last_comma_index >= last_index:
-                chunks_of_text.append(splited_text[last_index:last_comma_index + 1])
-                last_index = last_comma_index + 1
-            else:
-                chunks_of_text.append(splited_text[last_index:index+1])
-                last_index = index + 1
-
-    # Add the last chunk
-    if last_index < len(splited_text):
-        chunks_of_text.append(splited_text[last_index:])
-
-    # Verify the chunks
-    check_sentence = [word for chunk in chunks_of_text for word in chunk]
-
-    for index, word in enumerate(check_sentence):
-        if word != splited_text[index]:
-            print("Error Error")
-
-    return [" ".join(chunk) for chunk in chunks_of_text]
-
-
-
-async def async_translate_text(text: str, to_language ="eng") -> str:
+async def async_translate_text(text: str, to_language ="eng",
+                               chatgpt_model_name: Optional[ChatGPTModelForTranslator] = None,
+                               open_ai_api_key_for_this_translation: Optional[str] = None) -> str:
     global MAX_LENGTH
     global MAX_LENGTH_MINI_TEXT_CHUNK
+
+    chatgpt_model_name, client = _get_setup_for_one_request(chatgpt_model_name, open_ai_api_key_for_this_translation)
     text_chunks = split_text_to_chunks(text, MAX_LENGTH)
 
     # Run how_many_languages_are_in_text concurrently
-    counted_number_of_languages = await asyncio.gather(*[how_many_languages_are_in_text(text_chunk) for text_chunk in text_chunks])
-
-    #print(f"Counted number of languages {counted_number_of_languages}")
-    #print(f"len of text_chunks {len(text_chunks)}")
+    # Chunks that contain more than one language will be split (this will simplify translation for the LLM)
+    counted_number_of_languages = await asyncio.gather(*[how_many_languages_are_in_text(text_chunk, chatgpt_model_name,client) for text_chunk in text_chunks])
 
     tasks = []
     for index, text_chunk in enumerate(text_chunks):
         if counted_number_of_languages[index] > 1:
             mini_text_chunks = split_text_to_chunks(text_chunk, MAX_LENGTH_MINI_TEXT_CHUNK)
             for mini_text_chunk in mini_text_chunks:
-                tasks.append(translate_chunk_of_text(mini_text_chunk, to_language))
+                tasks.append(translate_chunk_of_text(mini_text_chunk, to_language, chatgpt_model_name, client))
         else:
-            tasks.append(translate_chunk_of_text(text_chunk, to_language))
+            tasks.append(translate_chunk_of_text(text_chunk, to_language, chatgpt_model_name, client))
 
     translated_list = await asyncio.gather(*tasks)
-
-    #print(translated_list)
-    #print(len(translated_list))
     return " ".join(translated_list)
 
-def translate(text, to_language ="eng") -> str: #ISO 639-3
+
+def translate(text, to_language ="eng",
+              chatgpt_model_name: Optional[ChatGPTModelForTranslator] = None,
+              open_ai_api_key_for_this_translation: Optional[str] = None) -> str: #ISO 639-3
     """
     Translates the given text to the specified language.
 
-    Parameters:
-    text (str): The text to be translated.
-    to_language (str): The target language code (ISO 639-3). Default is "eng" (English).
+    Required Parameters:
+    --------------------
+    text (str):
+        The text to be translated.
+
+    to_language (str):
+        The target language code (ISO 639-3). Default is "eng" (English).
+
+    Optional Parameters:
+    --------------------
+    chatgpt_model_name (Optional[ChatGPTModelForTranslator]):
+        The specific ChatGPT model to be used for this translation request.
+        If not provided, the global/default model will be used.
+        
+        Line to import enums:
+        from simpleaitranslator.utils.enums import ChatGPTModel
+        
+        Recommended enums are:
+        - ChatGPTModelForTranslator.BEST_BIG_MODEL
+        - ChatGPTModelForTranslator.BEST_SMALL_MODEL
+
+    open_ai_api_key_for_this_translation (Optional[str]):
+        An optional API key for OpenAI to be used specifically for this translation request.
+        This is useful if you want to override the global API key for this particular request.
+        Note that this will only work with the OpenAI client, not with the AzureOpenAI client.
 
     Returns:
-    str: The translated text.
+    --------
+    str:
+        The translated text.
     """
-    translated_text =  asyncio.run(async_translate_text(text, to_language))
+    translated_text = asyncio.run(async_translate_text(text, to_language, chatgpt_model_name, open_ai_api_key_for_this_translation))
     return translated_text
 
 
-class HowManyLanguages(BaseModel):
-    number_of_languages: int
 
-async def how_many_languages_are_in_text(text):
-    global CHATGPT_MODEL_NAME
-    global client
-    completion = await client.beta.chat.completions.parse(
-        model=CHATGPT_MODEL_NAME,
-        messages=[
-            {"role": "system", "content": "You are text languages counter you should count how many languaes are in provided by user text"},
-            {"role": "user", "content": f"Please count how many languaes are in this text:\n{text}"},
-        ],
-        response_format=HowManyLanguages,
-    )
-    event = completion.choices[0].message.parsed.number_of_languages
-    return event
+
+
+
 
