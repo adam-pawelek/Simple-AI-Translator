@@ -3,13 +3,13 @@ import re
 
 from simpleaitranslator.translator import TranslatorOpenAI
 
-from simpleaitranslator.utils.enums import ChatGPTModelForTranslator
+from simpleaitranslator.utils.enums import ModelForTranslator
 
 #print(os.environ.get("OPENAI_API_KEY"))
 
 #simpleaitranslator.translator.set_openai_api_key(None)
 
-translator = TranslatorOpenAI(os.environ.get("OPENAI_API_KEY"), ChatGPTModelForTranslator.GPT_4o_mini.value)
+translator = TranslatorOpenAI(os.environ.get("OPENAI_API_KEY"), ModelForTranslator.GPT_4o_mini.value)
 
 print(translator.get_text_language("jak ty się nazywasz"))
 print(translator.translate("Cześć jak się masz? Meu nome é Adam", "eng"))

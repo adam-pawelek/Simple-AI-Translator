@@ -1,9 +1,6 @@
 import os
-import simpleaitranslator
-from simpleaitranslator.translator import TranslatorOpenAI
-#from simpleaitranslator.translator import how_many_languages_are_in_text
+from simpleaitranslator.translator import TranslatorMistral
 from simpleaitranslator.utils.enums import ModelForTranslator
-from simpleaitranslator import translator
 
 text = """
 Gospodarstwo
@@ -36,7 +33,8 @@ Hi how are you?
 Zobaczymy czy teraz sobie z tym poradzisz
 """
 #print(os.environ.get("OPENAI_API_KEY"))
-translator = TranslatorOpenAI(os.environ.get("OPENAI_API_KEY"))
+#print(os.environ["MISTRAL_API_KEY"])
+translator = TranslatorMistral(os.environ.get("MISTRAL_API_KEY"), ModelForTranslator.MISTRAL_NEMO.value)
 #simpleaitranslator.translator.set_chatgpt_model(ChatGPTModelForTranslator.GPT_4o_mini)
 print(len(text))
 

@@ -1,4 +1,4 @@
-from simpleaitranslator.utils.enums import ChatGPTModelForTranslator
+from simpleaitranslator.utils.enums import ModelForTranslator
 
 
 class MissingAPIKeyError(Exception):
@@ -18,7 +18,7 @@ class NoneAPIKeyProvidedError(Exception):
 class InvalidModelName(Exception):
     """Exception raised for invalid model name."""
     def __init__(self, message="", invalid_model_name=None):
-        valid_models = ", ".join(model.value for model in ChatGPTModelForTranslator)
+        valid_models = ", ".join(model.value for model in ModelForTranslator)
         self.message = f"Invalid model name '{invalid_model_name}'. Value must be one of: {valid_models}"
         super().__init__(self.message)
 

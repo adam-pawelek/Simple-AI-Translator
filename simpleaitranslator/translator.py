@@ -2,12 +2,12 @@ import asyncio
 from openai import AsyncAzureOpenAI
 from openai import AsyncOpenAI
 from simpleaitranslator.exceptions import MissingAPIKeyError, NoneAPIKeyProvidedError, InvalidModelName
-from simpleaitranslator.utils.enums import ChatGPTModelForTranslator
+from simpleaitranslator.utils.enums import ModelForTranslator
 from pydantic import BaseModel
 from simpleaitranslator.utils.text_splitter import split_text_to_chunks, get_first_n_words
 from typing import Optional
 from abc import ABC, abstractmethod
-CHATGPT_MODEL_NAME = ChatGPTModelForTranslator.BEST_BIG_MODEL
+CHATGPT_MODEL_NAME = ModelForTranslator.BEST_BIG_MODEL
 global_client = None
 MAX_LENGTH = 1000
 MAX_LENGTH_MINI_TEXT_CHUNK = 128
@@ -170,7 +170,7 @@ class Translator(ABC):
 
 
 class TranslatorOpenAI(Translator):
-    def __init__(self, open_ai_api_key, chatgpt_model_name=ChatGPTModelForTranslator.BEST_BIG_MODEL.value):
+    def __init__(self, open_ai_api_key, chatgpt_model_name=ModelForTranslator.BEST_BIG_MODEL.value):
         self._set_api_key(open_ai_api_key)
         self._set_llm(chatgpt_model_name)
         self.max_length = MAX_LENGTH
@@ -206,19 +206,19 @@ class TranslatorOpenAI(Translator):
         """
 
         def validate_model(model_to_check: str) -> None:
-            if model_to_check not in {model.value for model in ChatGPTModelForTranslator}:
+            if model_to_check not in {model.value for model in ModelForTranslator}:
                 raise InvalidModelName(invalid_model_name=model_to_check)
 
         if isinstance(chatgpt_model_name, str):
             validate_model(chatgpt_model_name)
-            self.chatgpt_model_name = ChatGPTModelForTranslator(chatgpt_model_name)
+            self.chatgpt_model_name = ModelForTranslator(chatgpt_model_name)
         else:
             raise ValueError('chatgpt_model_name is required - current value is None or has wrong format')
 
 
 
 class TranslatorAzureOpenAI(TranslatorOpenAI):
-    def __init__(self,  azure_endpoint: str, api_key: str, api_version: str, azure_deployment: str, chatgpt_model_name=ChatGPTModelForTranslator.BEST_BIG_MODEL.value):
+    def __init__(self, azure_endpoint: str, api_key: str, api_version: str, azure_deployment: str, chatgpt_model_name=ModelForTranslator.BEST_BIG_MODEL.value):
         self._set_api_key(azure_endpoint, api_key, api_version, azure_deployment)
         self._set_llm(chatgpt_model_name)
         self.max_length = MAX_LENGTH
@@ -254,6 +254,53 @@ class TranslatorAzureOpenAI(TranslatorOpenAI):
             azure_deployment=azure_deployment
         )
 
+
+
+#Not supported yet waiting for LLM update
+class TranslatorMistral(Translator):
+    def __init__(self, open_ai_api_key, chatgpt_model_name=ModelForTranslator.MISTRAL_LARGE.value):
+        self._set_api_key(open_ai_api_key)
+        self._set_llm(chatgpt_model_name)
+        self.max_length = MAX_LENGTH
+        self.max_length_mini_text_chunk = MAX_LENGTH_MINI_TEXT_CHUNK
+
+    def _set_api_key(self, api_key):
+        """
+        Sets the API key for the OpenAI client.
+
+        Parameters:
+        api_key (str): The API key for authenticating with the OpenAI API.
+
+        Raises:
+        NoneAPIKeyProvidedError: If the api_key is empty or None.
+        """
+        if not api_key:
+            raise NoneAPIKeyProvidedError()
+        self.client = AsyncOpenAI(api_key=api_key, base_url="https://api.mistral.ai/v1") # mistral
+
+    def _set_llm(self, chatgpt_model_name: str):
+        """
+        Sets the default ChatGPT model.
+
+        This function allows you to change the default ChatGPT model used in the application.
+
+        Parameters:
+        chatgpt_model_name (str): The name of the ChatGPT model to set.
+
+        Raises:
+        InvalidModelName: If the provided model name is not valid.
+        ValueError: If the chatgpt_model_name is None or in an incorrect format.
+        """
+
+        def validate_model(model_to_check: str) -> None:
+            if model_to_check not in {model.value for model in ModelForTranslator}:
+                raise InvalidModelName(invalid_model_name=model_to_check)
+
+        if isinstance(chatgpt_model_name, str):
+            validate_model(chatgpt_model_name)
+            self.chatgpt_model_name = ModelForTranslator(chatgpt_model_name)
+        else:
+            raise ValueError('chatgpt_model_name is required - current value is None or has wrong format')
 
 
 
