@@ -1,6 +1,6 @@
 import os
 import simpleaitranslator
-from simpleaitranslator.translator import get_text_language
+from simpleaitranslator.translator import TranslatorOpenAI
 #from simpleaitranslator.translator import how_many_languages_are_in_text
 from simpleaitranslator.utils.enums import ChatGPTModelForTranslator
 from simpleaitranslator import translator
@@ -36,14 +36,14 @@ Hi how are you?
 Zobaczymy czy teraz sobie z tym poradzisz
 """
 #print(os.environ.get("OPENAI_API_KEY"))
-simpleaitranslator.translator.set_openai_api_key(os.environ.get("OPENAI_API_KEY"))
+translator = TranslatorOpenAI(os.environ.get("OPENAI_API_KEY"))
 #simpleaitranslator.translator.set_chatgpt_model(ChatGPTModelForTranslator.GPT_4o_mini)
 print(len(text))
 
 print()
 
 #print(how_many_languages_are_in_text(text))
-print(get_text_language("jak ty się nazywasz"))
-print(get_text_language(text))
+print(translator.get_text_language("jak ty się nazywasz"))
+print(translator.get_text_language(text))
 
 print(translator.translate(text, "eng"))

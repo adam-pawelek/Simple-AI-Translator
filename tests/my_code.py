@@ -1,18 +1,18 @@
 import os
 import re
 
-import simpleaitranslator.translator
-from simpleaitranslator.translator import get_text_language, translate
+from simpleaitranslator.translator import TranslatorOpenAI
+
 from simpleaitranslator.utils.enums import ChatGPTModelForTranslator
 
 #print(os.environ.get("OPENAI_API_KEY"))
 
 #simpleaitranslator.translator.set_openai_api_key(None)
 
-simpleaitranslator.translator.set_openai_api_key(os.environ.get("OPENAI_API_KEY"))
-simpleaitranslator.translator.set_chatgpt_model(ChatGPTModelForTranslator.GPT_4o_mini)
-print(get_text_language("jak ty się nazywasz"))
-print(translate("Cześć jak się masz? Meu nome é Adam", "eng"))
+translator = TranslatorOpenAI(os.environ.get("OPENAI_API_KEY"), ChatGPTModelForTranslator.GPT_4o_mini.value)
+
+print(translator.get_text_language("jak ty się nazywasz"))
+print(translator.translate("Cześć jak się masz? Meu nome é Adam", "eng"))
 
 
 
@@ -4541,7 +4541,7 @@ Romans, gdzie wymieniony jestem po imieniu.
 Romans ma tytuł: Polak, czyli tajemnice 
 """
 
-print(translate(text_example, "eng"))
+print(translator.translate(text_example, "eng"))
 
 print(len(text_example))
 
