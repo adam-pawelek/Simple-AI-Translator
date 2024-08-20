@@ -4,6 +4,7 @@
 [![Python Versions](https://img.shields.io/badge/Python-3.10%20|%203.11%20|%203.12-blue)](https://www.python.org/)
 [![PyPI version](https://img.shields.io/pypi/v/simpleaitranslator)](https://pypi.org/project/simpleaitranslator/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![codecov](https://codecov.io/github/adam-pawelek/SimpleAITranslator/graph/badge.svg?token=WCQOJC032S)](https://codecov.io/github/adam-pawelek/SimpleAITranslator)
 ## Overview
 
 SimpleAITranslator is a Python library designed to identify the language of a given text and translate text between multiple languages using OpenAI's GPT-4o. The library is especially useful for translating text containing multiple languages into a single target language.
