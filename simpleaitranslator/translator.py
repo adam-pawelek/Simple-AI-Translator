@@ -246,8 +246,7 @@ class TranslatorAzureOpenAI(TranslatorOpenAI):
             raise ValueError('api_version is required - current value is None')
         if not azure_endpoint:
             raise ValueError('azure_endpoint is required - current value is None')
-        global global_client
-        global_client = AsyncAzureOpenAI(
+        self.client = AsyncAzureOpenAI(
             azure_endpoint=azure_endpoint,
             api_key=api_key,
             api_version=api_version,
@@ -255,7 +254,7 @@ class TranslatorAzureOpenAI(TranslatorOpenAI):
         )
 
 
-
+'''
 #Not supported yet waiting for LLM update
 class TranslatorMistral(Translator):
     def __init__(self, open_ai_api_key, chatgpt_model_name=ModelForTranslator.MISTRAL_LARGE.value):
@@ -302,7 +301,7 @@ class TranslatorMistral(Translator):
         else:
             raise ValueError('chatgpt_model_name is required - current value is None or has wrong format')
 
-
+'''
 
 
 
