@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "simpleaitranslator"
-version = "2.2.12"
+version = "2.2.13"
 description = "A Python library for language detection and translation using OpenAI's GPT-4o."
 authors = ["Adam Pawelek <adam.pwk@outlook.com>"]
 readme = "README.md"
