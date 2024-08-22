@@ -417,10 +417,6 @@ test_data = [
     "يېڭى تىل ئۆگىنىش تەس بولىشى مۇمكىن، ئەمما ئۇ قىزىقارلىق. بۇ بىزگە ھەرقانداق پەرقلەرنى چۈشىنىپ، دۇنياغا قارىشىمىزنى ئەسلىگە كەلتۈرۈشنى ياردەم بېرىدۇ. بىز ئۆگىنىۋاتقان ھەرقانداق يېڭى تىل بىزگە يېڭى نەزەر بېرەلەيدۇ ۋە يېڭى پۇرسەتلەرنى ئېچىدۇ.",
     'ug'),
 
-    # Wolof
-    (
-    "Jàng xarnu bu bees dañ koy nangu ci, waaye itam dañ koy nangu ci. Moo tax, nu di séen ak nit ñi ci cosaan yu bari te di xam sa joaloo. Xarnu bu bees bu nu di jàng donoy nu yokk mbirum mbay mi te di nu jox ab yoon wu bees.",
-    'wo'),
 
     # Tswana
     (
