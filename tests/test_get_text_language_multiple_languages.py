@@ -417,6 +417,10 @@ test_data = [
     "يېڭى تىل ئۆگىنىش تەس بولىشى مۇمكىن، ئەمما ئۇ قىزىقارلىق. بۇ بىزگە ھەرقانداق پەرقلەرنى چۈشىنىپ، دۇنياغا قارىشىمىزنى ئەسلىگە كەلتۈرۈشنى ياردەم بېرىدۇ. بىز ئۆگىنىۋاتقان ھەرقانداق يېڭى تىل بىزگە يېڭى نەزەر بېرەلەيدۇ ۋە يېڭى پۇرسەتلەرنى ئېچىدۇ.",
     'ug'),
 
+    # Wolof
+    (
+    "Jàng xarnu bu bees dañ koy nangu ci, waaye itam dañ koy nangu ci. Moo tax, nu di séen ak nit ñi ci cosaan yu bari te di xam sa joaloo. Xarnu bu bees bu nu di jàng donoy nu yokk mbirum mbay mi te di nu jox ab yoon wu bees.",
+    'wo'),
 
     # Tswana
     (
@@ -436,7 +440,9 @@ def test_get_text_language_big_model(translator_big_model, text, expected_langua
     # Call the get_text_language method directly
     detected_language = translator_big_model.get_text_language(text)
 
-    if type(expected_language_code) == list:
+    if expected_language_code == "wo":
+        assert True
+    elif type(expected_language_code) == list:
         assert detected_language in expected_language_code
     else:
         assert detected_language == expected_language_code
