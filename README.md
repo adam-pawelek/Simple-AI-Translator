@@ -110,7 +110,7 @@ print(translated_text)  # Output: "Hello how are you? My name is Adam"
 
 ## Supported Languages
 
-SimpleAITranslator supports all languages supported by GPT-4o. For a complete list of language codes, you can visit the [ISO 639-1 website](https://iso639-3.sil.org/code_tables/639/data).
+SimpleAITranslator supports all languages supported by GPT-4o. For a complete list of language codes, you can visit the [ISO 639-1 website](https://localizely.com/iso-639-1-list/).
 
 Here are some of the most popular languages and their ISO 639-1 codes:
 
