@@ -69,7 +69,7 @@ translator = TranslatorOpenAI(open_ai_api_key="YOUR_OPENAI_API_KEY")
 
 # Detect language
 language_code = translator.get_text_language("Hello world")
-print(language_code)  # Output: 'eng'
+print(language_code)  # Output: 'en'
 
 ```
 
@@ -83,7 +83,7 @@ from simpleaitranslator.translator import TranslatorOpenAI
 translator = TranslatorOpenAI(open_ai_api_key="YOUR_OPENAI_API_KEY")
 
 # Translate text
-translated_text = translator.translate("Cześć jak się masz? Meu nome é Adam", "eng")
+translated_text = translator.translate("Cześć jak się masz? Meu nome é Adam", "en")
 print(translated_text)  # Output: "Hello how are you? My name is Adam"
 ```
 
@@ -103,7 +103,7 @@ language_code = translator.get_text_language("jak ty się nazywasz")
 print(language_code)  # Output: 'pol'
 
 # Translate text
-translated_text = translator.translate("Cześć jak się masz? Meu nome é Adam", "eng")
+translated_text = translator.translate("Cześć jak się masz? Meu nome é Adam", "en")
 print(translated_text)  # Output: "Hello how are you? My name is Adam"
 
 ```
@@ -114,28 +114,28 @@ SimpleAITranslator supports all languages supported by GPT-4o. For a complete li
 
 Here are some of the most popular languages and their ISO 639-1 codes:
 
-- English (eng)
-- Spanish (spa)
-- French (fra)
-- German (deu)
-- Chinese (zho)
-- Japanese (jpn)
-- Korean (kor)
-- Portuguese (por)
-- Russian (rus)
-- Italian (ita)
-- Dutch (nld)
-- Arabic (ara)
-- Hindi (hin)
-- Bengali (ben)
-- Turkish (tur)
-- Polish (pol)
-- Swedish (swe)
-- Norwegian (nor)
-- Danish (dan)
-- Finnish (fin)
-- Greek (ell)
-- Hebrew (heb)
+- **English**: `en`
+- **Spanish**: `es`
+- **French**: `fr`
+- **German**: `de`
+- **Chinese**: `zh`
+- **Japanese**: `ja`
+- **Korean**: `ko`
+- **Portuguese**: `pt`
+- **Russian**: `ru`
+- **Italian**: `it`
+- **Dutch**: `nl`
+- **Arabic**: `ar`
+- **Hindi**: `hi`
+- **Bengali**: `bn`
+- **Turkish**: `tr`
+- **Polish**: `pl`
+- **Swedish**: `sv`
+- **Norwegian**: `no`
+- **Danish**: `da`
+- **Finnish**: `fi`
+- **Greek**: `el`
+- **Hebrew**: `he`
 
 ## Additional Resources
 
