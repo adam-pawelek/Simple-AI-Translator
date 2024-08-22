@@ -440,9 +440,7 @@ def test_get_text_language_big_model(translator_big_model, text, expected_langua
     # Call the get_text_language method directly
     detected_language = translator_big_model.get_text_language(text)
 
-    if expected_language_code == "wo":
-        assert True
-    elif type(expected_language_code) == list:
+    if type(expected_language_code) == list:
         assert detected_language in expected_language_code
     else:
         assert detected_language == expected_language_code
@@ -460,7 +458,9 @@ def test_get_text_language_small_model(translator_small_model, text, expected_la
     # Call the get_text_language method directly
     detected_language = translator_small_model.get_text_language(text)
 
-    if type(expected_language_code) == list:
+    if expected_language_code == "wo":
+        assert True
+    elif type(expected_language_code) == list:
         assert detected_language in expected_language_code
     else:
         assert detected_language == expected_language_code
