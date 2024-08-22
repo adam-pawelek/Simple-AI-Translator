@@ -11,8 +11,8 @@ SimpleAITranslator is a Python library designed to identify the language of a gi
 
 ## Features
 
-- **Language Detection:** Identify the language of a given text in ISO 639-3 format.
-- **Translation:** Translate text containing multiple languages into another language in ISO 639-3 format.
+- **Language Detection:** Identify the language of a given text in ISO 639-1 format.
+- **Translation:** Translate text containing multiple languages into another language in ISO 639-1 format.
 
 ## Requirements
 
@@ -110,9 +110,9 @@ print(translated_text)  # Output: "Hello how are you? My name is Adam"
 
 ## Supported Languages
 
-SimpleAITranslator supports all languages supported by GPT-4o. For a complete list of language codes, you can visit the [ISO 639-3 website](https://iso639-3.sil.org/code_tables/639/data).
+SimpleAITranslator supports all languages supported by GPT-4o. For a complete list of language codes, you can visit the [ISO 639-1 website](https://iso639-3.sil.org/code_tables/639/data).
 
-Here are some of the most popular languages and their ISO 639-3 codes:
+Here are some of the most popular languages and their ISO 639-1 codes:
 
 - English (eng)
 - Spanish (spa)
@@ -140,7 +140,7 @@ Here are some of the most popular languages and their ISO 639-3 codes:
 ## Additional Resources
 
 - [PyPI page](https://pypi.org/project/simpleaitranslator/)
-- [ISO 639-3 Codes](https://iso639-3.sil.org/code_tables/639/data)
+- [ISO 639-1 Codes](https://iso639-3.sil.org/code_tables/639/data)
 - [Github project repository](https://github.com/adam-pawelek/SimpleAITranslator)
 
 ## Authors

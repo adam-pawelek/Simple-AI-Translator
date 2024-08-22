@@ -15,7 +15,7 @@ MAX_LENGTH_MINI_TEXT_CHUNK = 128
 
 class Translator(ABC):
     class TextLanguageFormat(BaseModel):
-        language_ISO_639_3_code: str
+        language_ISO_639_1_code: str
 
     class TranslateFormat(BaseModel):
         translated_text: str
@@ -40,7 +40,7 @@ class Translator(ABC):
     async def async_get_text_language(self,text) -> str:
         text = get_first_n_words(text, self.max_length)
         messages = [
-            {"role": "system", "content": "You are a language detector. You should return only the ISO 639-3 code of the text provided by user"},
+            {"role": "system", "content": "You are a language detector. You should return only the ISO 639-1 code of the text provided by user."},
             {"role": "user", "content": text}
         ]
 
@@ -50,12 +50,12 @@ class Translator(ABC):
             response_format=Translator.TextLanguageFormat  # auto is default, but we'll be explicit
         )
 
-        response_message = response.choices[0].message.parsed.language_ISO_639_3_code
+        response_message = response.choices[0].message.parsed.language_ISO_639_1_code
         return response_message
 
     def get_text_language(self, text: str) -> str:
         """
-        Detects the language of a given text using a specified ChatGPT model (ISO 639-3 code).
+        Detects the language of a given text using a specified ChatGPT model (ISO 639-1 code).
 
         Parameters:
         -----------
@@ -72,7 +72,7 @@ class Translator(ABC):
         Returns:
         --------
         str
-            ISO 639-3 code of the detected language.
+            ISO 639-1 code of the detected language.
 
         """
         result = asyncio.run(self.async_get_text_language(text))
@@ -117,7 +117,7 @@ class Translator(ABC):
         translated_list = await asyncio.gather(*tasks)
         return " ".join(translated_list)
 
-    def translate(self, text, to_language="eng") -> str: #ISO 639-3
+    def translate(self, text, to_language="eng") -> str: #ISO 639-1
         """
         Translates the given text to the specified language.
 
@@ -127,7 +127,7 @@ class Translator(ABC):
             The text to be translated.
 
         to_language (str):
-            The target language code (ISO 639-3). Default is "eng" (English).
+            The target language code (ISO 639-1). Default is "eng" (English).
 
         Optional Parameters:
         --------------------
