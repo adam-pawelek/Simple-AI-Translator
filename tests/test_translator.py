@@ -33,7 +33,7 @@ class TestTranslatorOpenAI:
             choices=[AsyncMock(message=AsyncMock(parsed=AsyncMock(translated_text="translated text")))]
         ))
 
-        result = await translator.translate_chunk_of_text("text", "eng")
+        result = await translator.translate_chunk_of_text("text", "en")
         assert result == "translated text"
 
     @pytest.mark.asyncio
@@ -41,7 +41,7 @@ class TestTranslatorOpenAI:
         translator = TranslatorOpenAI(open_ai_api_key="test_key")
         translator.client = None
         with pytest.raises(MissingAPIKeyError):
-            await translator.translate_chunk_of_text("text", "eng")
+            await translator.translate_chunk_of_text("text", "en")
 
 
 # Test TranslatorAzureOpenAI
@@ -84,16 +84,16 @@ class TestTranslatorMethods:
     async def test_async_get_text_language(self, translator):
         translator.client = AsyncMock()
         translator.client.beta.chat.completions.parse = AsyncMock(return_value=AsyncMock(
-            choices=[AsyncMock(message=AsyncMock(parsed=AsyncMock(language_ISO_639_3_code="eng")))]
+            choices=[AsyncMock(message=AsyncMock(parsed=AsyncMock(language_ISO_639_1_code="en")))]
         ))
 
         result = await translator.async_get_text_language("Hello world")
-        assert result == "eng"
+        assert result == "en"
 
     def test_get_text_language(self, translator):
-        with patch.object(TranslatorOpenAI, 'async_get_text_language', return_value="eng") as mock_async_method:
+        with patch.object(TranslatorOpenAI, 'async_get_text_language', return_value="en") as mock_async_method:
             result = translator.get_text_language("Hello world")
-            assert result == "eng"
+            assert result == "en"
             mock_async_method.assert_called_once()
 
     @pytest.mark.asyncio
@@ -107,13 +107,13 @@ class TestTranslatorMethods:
         # Mocking the how_many_languages_are_in_text to return an integer
         translator.how_many_languages_are_in_text = AsyncMock(return_value=1)
 
-        result = await translator.async_translate_text("Hello world", "eng")
+        result = await translator.async_translate_text("Hello world", "en")
 
         assert result == "translated text"
 
     def test_translate(self, translator):
         with patch.object(TranslatorOpenAI, 'async_translate_text', return_value="translated text") as mock_async_method:
-            result = translator.translate("Hello world", "eng")
+            result = translator.translate("Hello world", "en")
             assert result == "translated text"
             mock_async_method.assert_called_once()
 
