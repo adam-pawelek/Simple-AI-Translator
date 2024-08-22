@@ -4,6 +4,8 @@ from openai import AsyncOpenAI
 from simpleaitranslator.exceptions import MissingAPIKeyError, NoneAPIKeyProvidedError, InvalidModelName
 from simpleaitranslator.utils.enums import ModelForTranslator
 from pydantic import BaseModel
+
+from simpleaitranslator.utils.iso639_1 import iso_639_1_codes
 from simpleaitranslator.utils.text_splitter import split_text_to_chunks, get_first_n_words
 from typing import Optional
 from abc import ABC, abstractmethod
@@ -40,7 +42,7 @@ class Translator(ABC):
     async def async_get_text_language(self,text) -> str:
         text = get_first_n_words(text, self.max_length)
         messages = [
-            {"role": "system", "content": "You are a language detector. You should return only the ISO 639-1 code of the text provided by user."},
+            {"role": "system", "content": f"You are a language detector. You should return only the ISO 639-1 code of the text provided by user. All ISO-639-1 codes you can find here:\n {iso_639_1_codes}"},
             {"role": "user", "content": text}
         ]
 

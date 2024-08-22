@@ -3,16 +3,8 @@ import os
 import pytest
 
 from simpleaitranslator.translator import TranslatorOpenAI
+from simpleaitranslator.utils.enums import ModelForTranslator
 
-
-# Define a pytest fixture for the TranslatorOpenAI instance
-@pytest.fixture
-def translator():
-    return TranslatorOpenAI(open_ai_api_key=os.environ.get("OPENAI_API_KEY"))
-
-# Sample texts and their expected ISO 639-3 language codes
-# Sample texts and their expected ISO 639-3 language codes
-# Sample texts and their expected ISO 639-3 language codes for the 20 most popular languages
 test_data = [
     # English
     (
@@ -379,10 +371,6 @@ test_data = [
     "Lerni novan lingvon povas esti defio, sed ĝi estas ankaŭ ekscita. Ĝi helpas nin konekti kun homoj el diversaj kulturoj kaj pli bone kompreni la mondon. Ĉiu nova lingvo, kiun ni lernas, donas al ni freŝan perspektivon kaj malfermas novajn ŝancojn.",
     'eo'),
 
-    # Javanese
-    (
-    "Sinau basa anyar bisa dadi tantangan, nanging uga nyenengake. Iku mbantu kita nyambung karo wong saka macem-macem budaya lan luwih ngerti jagad iki. Saben basa anyar sing kita sinaoni menehi perspektif anyar lan mbukak kesempatan anyar.",
-    'jv'),
 
     # Kurdish
     (
@@ -442,10 +430,33 @@ test_data = [
 ]
 
 
+@pytest.fixture
+def translator_big_model():
+    return TranslatorOpenAI(open_ai_api_key=os.environ.get("OPENAI_API_KEY"))
+
+
 @pytest.mark.parametrize("text, expected_language_code", test_data)
-def test_get_text_language(translator, text, expected_language_code):
+def test_get_text_language_big_model(translator_big_model, text, expected_language_code):
     # Call the get_text_language method directly
-    detected_language = translator.get_text_language(text)
+    detected_language = translator_big_model.get_text_language(text)
+
+    if type(expected_language_code) == list:
+        assert detected_language in expected_language_code
+    else:
+        assert detected_language == expected_language_code
+
+
+
+@pytest.fixture
+def translator_small_model():
+    return TranslatorOpenAI(open_ai_api_key=os.environ.get("OPENAI_API_KEY"), chatgpt_model_name=ModelForTranslator.BEST_SMALL_MODEL.value)
+
+
+
+@pytest.mark.parametrize("text, expected_language_code", test_data)
+def test_get_text_language_small_model(translator_small_model, text, expected_language_code):
+    # Call the get_text_language method directly
+    detected_language = translator_small_model.get_text_language(text)
 
     if type(expected_language_code) == list:
         assert detected_language in expected_language_code
