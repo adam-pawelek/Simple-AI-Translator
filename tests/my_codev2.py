@@ -43,7 +43,8 @@ print(len(text))
 print()
 
 #print(how_many_languages_are_in_text(text))
-print(translator.get_text_language("jak ty się nazywasz"))
+print(translator.get_text_language("jak ty się nazywasz").language_name)
+print(translator.get_text_language("jak ty się nazywasz").language_ISO_639_1_code)
 print(translator.get_text_language(text))
 
 print(translator.translate(text, "eng"))

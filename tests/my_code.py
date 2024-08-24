@@ -11,7 +11,7 @@ from simpleaitranslator.utils.enums import ModelForTranslator
 
 translator = TranslatorOpenAI(os.environ.get("OPENAI_API_KEY"), ModelForTranslator.GPT_4o_mini.value)
 
-print(translator.get_text_language("jak ty się nazywasz"))
+print(translator.get_text_language("jak ty się nazywasz").language_name)
 print(translator.translate("Cześć jak się masz? Meu nome é Adam", "eng"))
 
 

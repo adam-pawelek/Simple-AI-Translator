@@ -438,12 +438,9 @@ def translator_big_model():
 @pytest.mark.parametrize("text, expected_language_code", test_data)
 def test_get_text_language_big_model(translator_big_model, text, expected_language_code):
     # Call the get_text_language method directly
-    detected_language = translator_big_model.get_text_language(text)
+    detected_language = translator_big_model.get_text_language(text).language_ISO_639_1_code
 
-    if type(expected_language_code) == list:
-        assert detected_language in expected_language_code
-    else:
-        assert detected_language == expected_language_code
+    assert detected_language == expected_language_code
 
 
 
@@ -456,12 +453,10 @@ def translator_small_model():
 @pytest.mark.parametrize("text, expected_language_code", test_data)
 def test_get_text_language_small_model(translator_small_model, text, expected_language_code):
     # Call the get_text_language method directly
-    detected_language = translator_small_model.get_text_language(text)
+    detected_language = translator_small_model.get_text_language(text).language_ISO_639_1_code
 
     if expected_language_code in ["wo", "xh"]:
         assert True
-    elif type(expected_language_code) == list:
-        assert detected_language in expected_language_code
     else:
         assert detected_language == expected_language_code
 

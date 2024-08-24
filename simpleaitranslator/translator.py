@@ -25,6 +25,10 @@ class Translator(ABC):
     class HowManyLanguages(BaseModel):
         number_of_languages: int
 
+    class TextLanguage(BaseModel):
+        language_ISO_639_1_code: str
+        language_name: str
+
     def __init__(self):
         self.client = None
         self.chatgpt_model_name = None
@@ -39,7 +43,7 @@ class Translator(ABC):
     def _set_llm(self, chatgpt_model_name):
         pass
 
-    async def async_get_text_language(self,text) -> str:
+    async def async_get_text_language(self, text) -> TextLanguage:
         text = get_first_n_words(text, self.max_length)
         messages = [
             {"role": "system", "content": f"You are a language detector. You should return only the ISO 639-1 code of the text provided by user. All ISO-639-1 codes you can find here:\n {iso_639_1_codes}"},
@@ -47,15 +51,19 @@ class Translator(ABC):
         ]
 
         response = await self.client.beta.chat.completions.parse(
-            model= self.chatgpt_model_name.value,
+            model=self.chatgpt_model_name.value,
             messages=messages,
             response_format=Translator.TextLanguageFormat  # auto is default, but we'll be explicit
         )
 
         response_message = response.choices[0].message.parsed.language_ISO_639_1_code
-        return response_message
+        detected_language = Translator.TextLanguage(
+            language_ISO_639_1_code=response_message,
+            language_name=iso_639_1_codes[response_message]
+        )
+        return detected_language
 
-    def get_text_language(self, text: str) -> str:
+    def get_text_language(self, text: str) -> TextLanguage:
         """
         Detects the language of a given text using a specified ChatGPT model (ISO 639-1 code).
 

@@ -88,12 +88,17 @@ class TestTranslatorMethods:
         ))
 
         result = await translator.async_get_text_language("Hello world")
-        assert result == "en"
+        assert result.language_ISO_639_1_code == "en"
 
     def test_get_text_language(self, translator):
-        with patch.object(TranslatorOpenAI, 'async_get_text_language', return_value="en") as mock_async_method:
+        with patch.object(TranslatorOpenAI, 'async_get_text_language',
+        return_value=Translator.TextLanguage(
+            language_ISO_639_1_code="en",
+            language_name="English"
+        )) as mock_async_method:
             result = translator.get_text_language("Hello world")
-            assert result == "en"
+            assert result.language_ISO_639_1_code == "en"
+            assert result.language_name == "English"
             mock_async_method.assert_called_once()
 
     @pytest.mark.asyncio
