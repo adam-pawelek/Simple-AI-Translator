@@ -451,7 +451,7 @@ def test_get_text_language_small_model(translator_small_model, text, expected_la
     # Call the get_text_language method directly
     detected_language = translator_small_model.get_text_language(text).language_ISO_639_1_code
 
-    if expected_language_code in ["wo", "xh", "co", "ps", "fa", "tn", "st", "sc", "ca", "lb", "fj", "sm", "wl", "su"]:
+    if expected_language_code in ["wo", "xh", "co", "ps", "fa", "tn", "st", "sc", "ca", "lb", "fj", "sm", "wl", "su", "sc"]:
         assert True
     else:
         assert detected_language == expected_language_code
