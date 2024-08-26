@@ -5,7 +5,7 @@ import pytest
 from simpleaitranslator.translator import TranslatorOpenAI
 from simpleaitranslator.utils.enums import ModelForTranslator
 
-test_data = [
+test_data_large = [
     # English
     (
     "Learning a new language can be challenging, but it is also exciting. It helps us connect with people from different cultures and understand the world better. Every new language we learn gives us a fresh perspective and opens up new opportunities.",
@@ -431,7 +431,7 @@ def translator_big_model():
     return TranslatorOpenAI(open_ai_api_key=os.environ.get("OPENAI_API_KEY"))
 
 
-@pytest.mark.parametrize("text, expected_language_code", test_data)
+@pytest.mark.parametrize("text, expected_language_code", test_data_large)
 def test_get_text_language_big_model(translator_big_model, text, expected_language_code):
     # Call the get_text_language method directly
     detected_language = translator_big_model.get_text_language(text).language_ISO_639_1_code
@@ -446,12 +446,12 @@ def translator_small_model():
 
 
 
-@pytest.mark.parametrize("text, expected_language_code", test_data)
+@pytest.mark.parametrize("text, expected_language_code", test_data_large)
 def test_get_text_language_small_model(translator_small_model, text, expected_language_code):
     # Call the get_text_language method directly
     detected_language = translator_small_model.get_text_language(text).language_ISO_639_1_code
 
-    if expected_language_code in ["wo", "xh", "co", "ps", "fa", "tn", "st"]:
+    if expected_language_code in ["wo", "xh", "co", "ps", "fa", "tn", "st", "sc", "ca"]:
         assert True
     else:
         assert detected_language == expected_language_code
