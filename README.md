@@ -142,7 +142,7 @@ Here are some of the most popular languages and their ISO 639-1 codes:
 ## Additional Resources
 
 - [PyPI page](https://pypi.org/project/simpleaitranslator/)
-- [ISO 639-1 Codes](https://iso639-3.sil.org/code_tables/639/data)
+- [ISO 639-1 Codes](https://localizely.com/iso-639-1-list/)
 - [Github project repository](https://github.com/adam-pawelek/SimpleAITranslator)
 
 ## Authors
