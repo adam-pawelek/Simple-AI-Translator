@@ -24,7 +24,7 @@ def split_text_to_chunks(text, max_lenght):
         if "." in word or "?" in word or "!" in word:
             last_dot_index = index
 
-        if (index - last_index + 1) > max_lenght:
+        if (index - last_index + 1) >= max_lenght:
             if last_dot_index >= last_index:
                 chunks_of_text.append(splited_text[last_index:last_dot_index + 1])
                 last_index = last_dot_index + 1
