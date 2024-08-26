@@ -6,9 +6,6 @@ from simpleaitranslator.utils.enums import ModelForTranslator
 from simpleaitranslator import translator
 
 text = """
-Gospodarstwo
-Powrót panicza — Spotkanie się pierwsze w pokoiku, drugie u stołu — Ważna Sędziego nauka o grzeczności — Podkomorzego uwagi polityczne nad modami — Początek sporu o Kusego i Sokoła — Żale Wojskiego — Ostatni Woźny Trybunału — Rzut oka na ówczesny stan polityczny Litwy i Europy
-
 Litwo! Ojczyzno moja! ty jesteś jak zdrowie:
 Ile cię trzeba cenić, ten tylko się dowie,
 Kto cię stracił. Dziś piękność twą w całej ozdobie
